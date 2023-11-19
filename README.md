@@ -1,1 +1,1 @@
-# proiect-php
+Proiect PHP: Activitatile unui hipermarket
