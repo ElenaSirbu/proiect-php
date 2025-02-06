@@ -1,14 +1,12 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['utilizator'])) {
-    header('Location: login.php');
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
     exit();
 }
 
-include('navbar.php');
+echo "<h1>Salut, " . $_SESSION['username'] . "!</h1>";
+echo "<p>Ai acces la dashboard ca " . $_SESSION['role'] . ".</p>";
+
 ?>
-
-<h1>Panou utilizator: <?php echo $_SESSION['utilizator']['username']; ?></h1>
-
-<p>Acesta este panoul principal. În funcție de rol, vei avea acces la diferite secțiuni ale aplicației.</p>
