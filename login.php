@@ -1,30 +1,42 @@
 <?php
-session_start();
+session_start();  
 
-if (isset($_SESSION['utilizator'])) {
-    header('Location: dashboard.php');
-    exit();
-}
+include('db_config.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    if ($username == 'admin' && $password == 'parolaadmin') {
-        $_SESSION['utilizator'] = ['username' => 'admin', 'rol' => 'admin'];
-        header('Location: dashboard.php');
-        exit();
-    } elseif ($username == 'angajat' && $password == 'parolaangajat') {
-        $_SESSION['utilizator'] = ['username' => 'angajat', 'rol' => 'angajat'];
-        header('Location: dashboard.php');
-        exit();
-    } elseif ($username == 'client' && $password == 'parolaclient') {
-        $_SESSION['utilizator'] = ['username' => 'client', 'rol' => 'client'];
-        header('Location: dashboard.php');
-        exit();
+    $sql = "SELECT * FROM utilizatori WHERE username = ?";
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("s", $username);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role']; 
+
+                header("Location: dashboard.php");
+                exit();
+            } else {
+                echo "Parola incorectă!";
+            }
+        } else {
+            echo "Utilizatorul nu există!";
+        }
+
+        $stmt->close();
     } else {
-        $error = "Username sau parolă incorecte.";
+        echo "Eroare la pregătirea interogării: " . $conn->error;
     }
+
+    $conn->close();
 }
 ?>
 
@@ -33,22 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autentificare</title>
+    <title>Login</title>
 </head>
 <body>
-    <h1>Autentificare</h1>
-
-    <?php if (isset($error)) { echo "<p style='color: red;'>$error</p>"; } ?>
-
-    <form method="POST" action="">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+    <h2>Autentificare</h2>
+    <form action="login.php" method="POST">
+        <label for="username">Nume utilizator:</label>
+        <input type="text" id="username" name="username" required><br><br>
 
         <label for="password">Parolă:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" required><br><br>
 
-        <button type="submit">Autentifică-te</button>
+        <input type="submit" value="Autentificare">
     </form>
-    <p>Nu ai cont? <a href="register.php">Creează un cont</a></p>
 </body>
 </html>
