@@ -1,0 +1,168 @@
+##Ce face aplicatia?
+
+	Aplicația web pentru activitățile unui hypermarket este destinată gestionării și optimizării operațiunilor zilnice ale unui lanț de magazine. Aceasta oferă funcționalități variate, inclusiv gestionarea stocurilor, servicii pentru clienți, procesarea comenzilor online (dacă există), monitorizarea vânzărilor, administrarea personalului și multe altele.
+
+### Funcționalități:
+- **Gestionarea stocurilor**: Adăugare, editare, ștergere și căutare produse.
+- **Plasarea comenzilor**: Clienții pot plasa comenzi online (dacă este cazul).
+- **Rapoarte financiare**: Administratorul poate genera rapoarte pentru vânzări și profit.
+- **Gestionarea utilizatorilor**: Creare, editare și ștergere conturi pentru angajați și clienți.
+
+##Arhitectura
+
+#Rolurile si Entitatile:
+
+	Administrator:
+	-Monitorizarea vânzărilor și rapoartelor financiare
+	-Administrarea conturilor de utilizatori
+	-Angajat al Hipermarketului:
+	-Gestionarea stocurilor și prețurilor
+	-Interacțiunea cu clienții
+	-Gestionarea informatiilor despre produse
+
+	Client:
+	-Navigarea și căutarea produselor
+	-Adăugarea produselor în coșul de cumpărături
+	-Plasarea comenzilor online (opțional)
+
+#Componente Principale:
+
+	Interfata cu Utilizatorul (UI):
+	-Pagini pentru navigare, căutare și plasarea comenzilor pentru clienti
+	-Panouri de administrare pentru angajați și administrator
+
+	Servicii Web (Backend):
+	-Gestionarea logică a operațiunilor, comunicarea cu baza de date.
+
+	Bază de Date:
+	-Stocarea si gestionarea informațiilor despre produse, stocuri, clienți etc.
+
+
+### Securitate:
+- Autentificare cu username și parolă pentru fiecare tip de utilizator.
+- Acces restricționat în funcție de rol (client, angajat, administrator).
+- Protecție împotriva atacurilor SQL Injection și XSS.
+
+### Scalabilitate:
+- Baza de date este proiectată să suporte un număr mare de produse și comenzi.
+- Aplicația poate fi extinsă cu noi funcționalități în viitor.
+
+### Interfață utilizator:
+- **Pagini pentru clienți**: Căutare produse, coș de cumpărături, plasare comenzi.
+- **Pagini pentru angajați**: Gestionare stocuri, vizualizare comenzi.
+- **Pagini pentru administrator**: Rapoarte financiare, gestionare utilizatori.
+
+##Descrierea Bazei de Date:
+Entitati principale:
+Utilizatori (Users):
+
+id (cheie primară)
+
+username (nume de utilizator)
+
+password (parolă hashuită)
+
+email (email utilizator)
+
+role (rol: client, angajat, administrator)
+
+created_at (data creării contului)
+
+Produse (Products):
+
+id (cheie primară)
+
+name (nume produs)
+
+price (preț)
+
+quantity (cantitate în stoc)
+
+category_id (cheie străină către tabela Categories)
+
+created_at (data adăugării produsului)
+
+Categorii (Categories):
+
+id (cheie primară)
+
+name (nume categorie)
+
+Comenzi (Orders):
+
+id (cheie primară)
+
+user_id (cheie străină către Users)
+
+total (total comandă)
+
+status (status comandă: plasată, livrată, anulată)
+
+created_at (data plasării comenzii)
+
+Detalii Comenzi (OrderItems):
+
+id (cheie primară)
+
+order_id (cheie străină către Orders)
+
+product_id (cheie străină către Products)
+
+quantity (cantitate comandată)
+
+price (preț la momentul comenzii)
+
+Rapoarte (Reports):
+
+id (cheie primară)
+
+type (tip raport: vânzări, profit, stocuri)
+
+data (date raport)
+
+created_at (data generării raportului)
+
+Relații între tabele
+Utilizatori ↔ Comenzi: Un utilizator poate avea mai multe comenzi.
+
+Comenzi ↔ Detalii Comenzi: O comandă poate conține mai multe produse.
+
+Produse ↔ Categorii: Un produs aparține unei categorii.
+
+Produse ↔ Detalii Comenzi: Un produs poate apărea în mai multe comenzi.
+
+
+(suplimentar)
+
+Tabela Recenzii (Reviews):
+
+id (cheie primară)
+
+user_id (cheie străină către Users)
+
+product_id (cheie străină către Products)
+
+rating (nota acordată, de exemplu de la 1 la 5 stele)
+
+comment (comentariul clientului)
+
+created_at (data adăugării recenziei)
+
+Tabela Răspunsuri (ReviewReplies):
+
+id (cheie primară)
+
+review_id (cheie străină către Reviews)
+
+user_id (cheie străină către Users, pentru a ști cine a răspuns)
+
+reply (răspunsul angajatului)
+
+created_at (data adăugării răspunsului)
+
+Solutie de implementare:
+Frontend (Interfata Utilizator): HTML, CSS, JavaScript
+Backend (Servicii Web): PHP
+Baza de Date: MySQL
+Gazduire: Heroku
+
