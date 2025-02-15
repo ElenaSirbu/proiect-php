@@ -1,15 +1,8 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'administrator') {
-    header("Location: login.php");
-    exit;
-}
-else if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'angajat') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'angajat' && $_SESSION['role'] !== 'administrator')) {
+    // Dacă nu e logat sau rolul nu e angajat sau administrator, redirecționăm la login
     header("Location: login.php");
     exit;
 }
