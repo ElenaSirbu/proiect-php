@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO utilizatori (username, password, email) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO Users (username, password, email) VALUES (?, ?, ?)";
 
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("sss", $username, $hashed_password, $email);
