@@ -14,28 +14,23 @@ if (isset($_SESSION['utilizator'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagina Principală - Hipermarket</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Optional Bootstrap theme (CDN) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap-theme.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-    <div class="container">
-        <h1>Bun venit la Hipermarket!</h1>
+    <div class="container text-center mt-5">
+        <h1 class="display-4">Bun venit la Hipermarket!</h1>
+        <p class="lead">Vă oferim cele mai bune produse la prețuri excelente.</p>
 
-        <p>Vă oferim cele mai bune produse la prețuri excelente.</p>
-
-        <div class="buttons-container">
-            <a href="login.php">
-                <button class="button">Autentifică-te</button>
-            </a>
-            <a href="create_user.php">
-                <button class="button">Creează un cont</button>
-            </a>
+        <!-- Butoane pentru login și creare cont -->
+        <div class="d-flex justify-content-center mt-4">
+            <a href="login.php" class="btn btn-primary btn-lg mr-3">Autentifică-te</a>
+            <a href="create_user.php" class="btn btn-success btn-lg">Creează un cont</a>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+

@@ -48,27 +48,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Autentificare - Hipermarket</title>
+
+    <!-- Bootstrap CSS (CDN) -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Optional Bootstrap theme (CDN) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap-theme.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Autentificare</h2>
+<body class="bg-light">
 
-    <?php
-    if (isset($error)) {
-        echo "<p style='color: red;'>$error</p>";
-    }
-    ?>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h1 class="card-title text-center mb-4">Autentifică-te</h1>
 
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Autentifică-te</button>
-    </form>
+                        <!-- Afișăm mesajul de eroare, dacă există -->
+                        <?php if (isset($error)): ?>
+                            <div class="alert alert-danger"><?php echo $error; ?></div>
+                        <?php endif; ?>
 
+                        <!-- Formular de login -->
+                        <form method="POST" action="login.php">
+                            <div class="form-group">
+                                <label for="username">Nume utilizator:</label>
+                                <input type="text" class="form-control" id="username" name="username" required placeholder="Introduceti numele de utilizator">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Parolă:</label>
+                                <input type="password" class="form-control" id="password" name="password" required placeholder="Introduceti parola">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">Autentifică-te</button>
+                        </form>
+
+                        <p class="text-center mt-3">Nu ai cont? <a href="create_user.php">Creează unul acum!</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS și jQuery (CDN) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
