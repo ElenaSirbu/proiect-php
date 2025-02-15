@@ -14,14 +14,18 @@ $user_id = $_SESSION['user_id'];
 $cart = [];
 $total = 0;
 
-if (isset($_POST['product'])) {
-    foreach ($_POST['product'] as $product_id => $details) {
-        if ($details['quantity'] > 0) {
-            $cart[] = [
-                'product_id' => $product_id,
-                'quantity' => $details['quantity']
-            ];
-        }
+// Verificăm dacă utilizatorul a selectat produse
+if (!isset($_POST['product']) || empty($_POST['product'])) {
+    echo "Nu ai selectat produse!";
+    exit;
+}
+
+foreach ($_POST['product'] as $product_id => $details) {
+    if (isset($details['quantity']) && $details['quantity'] > 0) {
+        $cart[] = [
+            'product_id' => $product_id,
+            'quantity' => $details['quantity']
+        ];
     }
 }
 
