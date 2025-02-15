@@ -14,6 +14,8 @@ $user_id = $_SESSION['user_id'];
 $cart = [];
 $total = 0;
 
+echo number_format($total, 2);
+
 // Verificăm dacă utilizatorul a selectat produse
 if (!isset($_POST['product']) || empty($_POST['product'])) {
     echo "Nu ai selectat produse!";
