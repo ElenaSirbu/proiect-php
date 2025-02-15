@@ -26,7 +26,7 @@ if (isset($_SESSION['utilizator'])) {
             <a href="login.php">
                 <button class="button">Autentifică-te</button>
             </a>
-            <a href="register.php">
+            <a href="create_user.php">
                 <button class="button">Creează un cont</button>
             </a>
         </div>
