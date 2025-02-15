@@ -33,10 +33,11 @@ if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Export CSV
-    $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
-              FROM Orders o
-              JOIN Users u ON o.user_id = u.id
-              JOIN OrderItems oi ON o.id = oi.order_id";
+    $query = "SELECT o.id AS order_id, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, 
+                 o.status, u.username, oi.product_id, oi.quantity, oi.price 
+          FROM Orders o
+          JOIN Users u ON o.user_id = u.id
+          JOIN OrderItems oi ON o.id = oi.order_id";
     $result_csv = $conn->query($query);
 
     if ($result_csv->num_rows > 0) {
@@ -89,7 +90,8 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     while ($row = $result_pdf->fetch_assoc()) {
         $pdf->Cell(30, 10, $row['order_id'], 1);
-        $pdf->Cell(40, 10, $row['created_at'], 1);
+        $pdf->Cell(40, 10, date('Y-m-d H:i:s', strtotime($row['created_at'])), 1);
+
         $pdf->Cell(30, 10, $row['status'], 1);
         $pdf->Cell(40, 10, $row['username'], 1);
         $pdf->Cell(30, 10, $row['product_id'], 1);
@@ -98,8 +100,9 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdf->Ln();
     }
 
-    $pdf->Output('D', 'comenzi.pdf');
-    exit;
+    ob_end_clean(); // Elimină orice output anterior pentru a preveni coruperea PDF-ului
+$pdf->Output('D', 'comenzi.pdf');
+exit;
 }
 
 // Generăm token CSRF pentru protecție
