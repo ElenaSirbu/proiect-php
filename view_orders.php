@@ -16,24 +16,15 @@ $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
-?>
-<?php
+
 // Export CSV
-session_start();
-include 'db_config.php';
-
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'angajat' && $_SESSION['role'] != 'administrator')) {
-    header("Location: login.php");
-    exit;
-}
-
 if (isset($_POST['export_csv'])) {
     // Selectăm comenzile și detaliile acestora
     $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
               FROM Orders o
               JOIN Users u ON o.user_id = u.id
               JOIN OrderItems oi ON o.id = oi.order_id";
-    $result = $conn->query($query);
+    $result_csv = $conn->query($query);
 
     // Deschidem fișierul pentru scrierea CSV
     header('Content-Type: text/csv');
@@ -44,36 +35,25 @@ if (isset($_POST['export_csv'])) {
     fputcsv($output, ['Order ID', 'Data', 'Status', 'Client', 'Produs ID', 'Cantitate', 'Preț']);
 
     // Scriem datele
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $result_csv->fetch_assoc()) {
         fputcsv($output, $row);
     }
 
     fclose($output);
     exit;
 }
-?>
 
-<?php
 // Export PDF
-
-session_start();
-include 'db_config.php';
-require('fpdf.php');
-
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'angajat' && $_SESSION['role'] != 'administrator')) {
-    header("Location: login.php");
-    exit;
-}
-
 if (isset($_POST['export_pdf'])) {
     // Selectăm comenzile și detaliile acestora
     $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
               FROM Orders o
               JOIN Users u ON o.user_id = u.id
               JOIN OrderItems oi ON o.id = oi.order_id";
-    $result = $conn->query($query);
+    $result_pdf = $conn->query($query);
 
     // Creăm instanța FPDF
+    require('fpdf.php');
     $pdf = new FPDF();
     $pdf->AddPage();
 
@@ -94,7 +74,7 @@ if (isset($_POST['export_pdf'])) {
     $pdf->Ln();
 
     // Adăugăm datele
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $result_pdf->fetch_assoc()) {
         $pdf->Cell(30, 10, $row['order_id'], 1);
         $pdf->Cell(40, 10, $row['created_at'], 1);
         $pdf->Cell(30, 10, $row['status'], 1);
@@ -111,7 +91,6 @@ if (isset($_POST['export_pdf'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -121,6 +100,16 @@ if (isset($_POST['export_pdf'])) {
 </head>
 <body>
     <h2>Comenzile mele</h2>
+
+    <!-- Formular pentru export CSV -->
+    <form method="POST">
+        <button type="submit" name="export_csv">Exportă în CSV</button>
+    </form>
+
+    <!-- Formular pentru export PDF -->
+    <form method="POST">
+        <button type="submit" name="export_pdf">Exportă în PDF</button>
+    </form>
 
     <table border="1">
         <thead>
@@ -146,13 +135,5 @@ if (isset($_POST['export_pdf'])) {
             <?php endwhile; ?>
         </tbody>
     </table>
-    <form method="POST">
-    <button type="submit" name="export_csv">Exportă în CSV</button>
-    
-</form>
-<form method="POST">
-    <button type="submit" name="export_pdf">Exportă în PDF</button>
-</form>
-
 </body>
 </html>
