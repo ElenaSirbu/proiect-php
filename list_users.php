@@ -1,15 +1,17 @@
 <?php
 session_start();
 
-/*if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'administrator') {
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'administrator') {
     header("Location: login.php");
     exit;
 }
 // Verificăm dacă utilizatorul este autentificat
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}*/
+
 
 // Acum include conexiunea la baza de date
 include 'db_config.php';

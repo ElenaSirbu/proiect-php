@@ -1,7 +1,6 @@
 <?php
 session_start();
-session_unset();
-session_destroy();
-header('Location: index.php');
-exit();
+session_destroy(); // Distruge sesiunea
+header("Location: login.php"); // Redirecționăm utilizatorul către pagina de login
+exit;
 ?>
