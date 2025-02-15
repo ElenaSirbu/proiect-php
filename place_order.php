@@ -45,8 +45,17 @@ foreach ($cart as $item) {
 $query = "INSERT INTO Orders (user_id, total, status) VALUES (?, ?, ?)";
 $status = "plasată"; // Statusul inițial al comenzii
 $stmt = $conn->prepare($query);
+if ($stmt === false) {
+    echo "Eroare la pregătirea interogării: " . $conn->error;
+    exit;
+}
+
 $stmt->bind_param("ids", $user_id, $total, $status);
-$stmt->execute();
+if (!$stmt->execute()) {
+    echo "Eroare la executarea interogării: " . $stmt->error;
+    exit;
+}
+
 $order_id = $stmt->insert_id; // ID-ul comenzii plasate
 
 // Adăugăm produsele în OrderItems
@@ -57,6 +66,9 @@ foreach ($cart as $item) {
     $stmt->bind_param("iiid", $order_id, $item['product_id'], $item['quantity'], $item['product_id']);
     $stmt->execute();
 }
-
-echo "Comanda a fost plasată cu succes!";
+if ($stmt->execute()) {
+    echo "Comanda a fost plasată cu succes!";
+} else {
+    echo "Eroare la plasarea comenzii: " . $stmt->error;
+}
 ?>
