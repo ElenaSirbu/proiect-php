@@ -32,3 +32,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </select>
     <button type="submit">Adaugă Utilizator</button>
 </form>
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- Include fișierul CSS -->
+    <link rel="stylesheet" href="style.css"> <!-- Calea corectă în funcție de locul unde ai salvat CSS-ul -->
+</head>
+<body>
