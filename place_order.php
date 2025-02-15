@@ -55,6 +55,10 @@ foreach ($cart as $item) {
     $total += $product['price'] * $item['quantity'];
 }
 
+
+echo number_format($total, 2);
+
+
 // Inserăm comanda în baza de date
 $query = "INSERT INTO Orders (user_id, total, status) VALUES (?, ?, ?)";
 $status = "plasată"; // Statusul inițial al comenzii
