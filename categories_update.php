@@ -3,7 +3,7 @@ include 'db_config.php';
 session_start();
 
 // Verificăm dacă utilizatorul este autentificat și are rol de admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'administrator') {
     header("Location: dashboard.php");
     exit;
 }

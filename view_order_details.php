@@ -38,7 +38,7 @@ if (isset($_GET['order_id'])) {
     // Obținem produsele din comanda
     $query = "SELECT oi.product_id, p.name, oi.quantity, oi.price FROM OrderItems oi
               JOIN Products p ON oi.product_id = p.id
-              WHERE oi.order_id = ?";
+              WHERE oi.id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();

@@ -37,24 +37,27 @@ $username = htmlspecialchars($_SESSION['username']);
             <ul class="list-group">
                 <?php if ($user_role == 'client'): ?>
                     <!-- Opțiuni pentru client -->
-                    <li class="list-group-item"><a href="search_products.php">Căutare produse</a></li>
-                    <li class="list-group-item"><a href="cart.php">Coș</a></li>
-                    <li class="list-group-item"><a href="profile.php">Informații personale</a></li>
+                  <!-- <li class="list-group-item"><a href="search_products.php">Căutare produse</a></li>
+                    <li class="list-group-item"><a href="order.php">Cart</a></li>
+                    <li class="list-group-item"><a href="profile.php">Informații personale</a></li>-->
+                    <li class="list-group-item"><a href="order.php">Cos de cumparaturi</a></li>
                     <li class="list-group-item"><a href="view_orders.php">Comenzile mele</a></li>
 
                 <?php elseif ($user_role == 'angajat'): ?>
-                    <!-- Opțiuni pentru angajat -->
-                    <li class="list-group-item"><a href="manage_products.php">Gestionare produse</a></li>
+                     
+                    <li class="list-group-item"><a href="list_products.php">Gestionare produse</a></li>
                     <li class="list-group-item"><a href="view_orders.php">Vizualizează comenzile</a></li>
-                    <li class="list-group-item"><a href="customer_interactions.php">Interacțiuni cu clienții</a></li>
-                    <li class="list-group-item"><a href="update_order.php">Actualizează comenzi</a></li>
+                   <!-- <li class="list-group-item"><a href="customer_interactions.php">Interacțiuni cu clienții</a></li>-->
+                    <li class="list-group-item"><a href="process_order.php">Actualizează comenzi</a></li>
 
-                <?php elseif ($user_role == 'admin'): ?>
-                    <!-- Opțiuni pentru admin -->
-                    <li class="list-group-item"><a href="manage_users.php">Gestionare utilizatori</a></li>
-                    <li class="list-group-item"><a href="reports.php">Rapoarte financiare</a></li>
+                <?php elseif ($user_role == 'administrator'): ?>
+                    
+                    <li class="list-group-item"><a href="list_users.php">Gestionare utilizatori</a></li>
+                    <li class="list-group-item"><a href="list_products.php">Gestionare produse</a></li>
+                    <li class="list-group-item"><a href="categories_read.php">Gestionare categorii</a></li>
+                   <!-- Opțiuni pentru admin  <li class="list-group-item"><a href="reports.php">Rapoarte financiare</a></li>
                     <li class="list-group-item"><a href="sales_reports.php">Raport vânzări</a></li>
-                    <li class="list-group-item"><a href="admin_settings.php">Setări admin</a></li>
+                    <li class="list-group-item"><a href="admin_settings.php">Setări admin</a></li>-->
 
                 <?php endif; ?>
             </ul>

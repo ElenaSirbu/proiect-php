@@ -21,16 +21,29 @@ if ($role !== 'client' && $role !== 'angajat') {
     exit;
 }
 
-// Obținem comenzile utilizatorului
-$query = "SELECT id, total, status, created_at FROM Orders WHERE user_id = ?";
+// Obținem comenzile
+if ($role === 'client') {
+    // Clientul vede doar comenzile sale
+    $query = "SELECT id, total, status, created_at FROM Orders WHERE user_id = ?";
+} else {
+    // Angajatul vede toate comenzile și numele clientului
+    $query = "SELECT o.id, o.total, o.status, o.created_at, u.username 
+              FROM Orders o
+              JOIN Users u ON o.user_id = u.id";
+}
+
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $user_id);
+
+if ($role === 'client') {
+    $stmt->bind_param("i", $user_id);
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
 
 // Verificăm dacă utilizatorul a solicitat exportul CSV
 if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Token CSRF pentru protecție
+    // Token CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die("Token CSRF invalid.");
     }
@@ -40,7 +53,7 @@ if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                  o.status, u.username, oi.product_id, oi.quantity, oi.price 
           FROM Orders o
           JOIN Users u ON o.user_id = u.id
-          JOIN OrderItems oi ON o.id = oi.id";
+          JOIN OrderItems oi ON o.id = oi.order_id";
     $result_csv = $conn->query($query);
 
     if ($result_csv->num_rows > 0) {
@@ -62,7 +75,7 @@ if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Verificăm dacă utilizatorul a solicitat exportul PDF
 if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Token CSRF pentru protecție
+    // Token CSRF
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die("Token CSRF invalid.");
     }
@@ -73,12 +86,13 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                  o.status, u.username, oi.product_id, oi.quantity, oi.price 
           FROM Orders o
           JOIN Users u ON o.user_id = u.id
-          JOIN OrderItems oi ON o.id = oi.id";
+          JOIN OrderItems oi ON o.id = oi.order_id";
     $result_pdf = $conn->query($query);
-    if ($result_pdf->num_rows == 0)
-    {
+    
+    if ($result_pdf->num_rows == 0) {
         die("Nu există date pentru export.");
     }
+
     // Creăm instanța FPDF
     $pdf = new FPDF();
     $pdf->AddPage();
@@ -98,7 +112,6 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     while ($row = $result_pdf->fetch_assoc()) {
         $pdf->Cell(30, 10, $row['order_id'], 1);
         $pdf->Cell(40, 10, date('Y-m-d H:i:s', strtotime($row['created_at'])), 1);
-
         $pdf->Cell(30, 10, $row['status'], 1);
         $pdf->Cell(40, 10, $row['username'], 1);
         $pdf->Cell(30, 10, $row['product_id'], 1);
@@ -107,16 +120,13 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdf->Ln();
     }
 
-    ob_end_clean(); // Elimină orice output anterior pentru a preveni coruperea PDF-ului
-    $pdf->Output();
-
-exit;
-
+    ob_end_clean();
+    $pdf->Output('D', 'comenzi.pdf');
+    exit;
 }
 
 // Generăm token CSRF pentru protecție
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
 ?>
 
 <!DOCTYPE html>
@@ -141,6 +151,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             <thead>
                 <tr>
                     <th>ID Comandă</th>
+                    <?php if ($role === 'angajat'): ?>
+                        <th>Client</th> 
+                    <?php endif; ?>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Data</th>
@@ -151,6 +164,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 <?php while ($order = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($order['id']); ?></td>
+                        <?php if ($role === 'angajat'): ?>
+                            <td><?php echo htmlspecialchars($order['username']); ?></td> 
+                        <?php endif; ?>
                         <td><?php echo htmlspecialchars($order['total']); ?> RON</td>
                         <td><?php echo htmlspecialchars($order['status']); ?></td>
                         <td><?php echo htmlspecialchars($order['created_at']); ?></td>
@@ -164,9 +180,5 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         <a href="dashboard.php" class="btn btn-secondary">Înapoi la dashboard</a>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
