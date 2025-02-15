@@ -20,6 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $result = $stmt->get_result();
     
+    
     if ($result->num_rows > 0) {
         echo "<p class='alert alert-danger'>Utilizatorul există deja!</p>";
     } else {
@@ -27,7 +28,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $conn->prepare("INSERT INTO Users (username, password, email, role) VALUES (?, ?, ?, ?)");
         $role = 'client'; // Default role pentru utilizator nou
         $stmt->bind_param("ssss", $username, $password, $email, $role);
+        $site_key = '6Le1TNgqAAAAAENie2ZNrU4CIFd6lAXPDzhBGWsK'; // Înlocuiește cu cheia ta publică
 
+// Dacă formularul este trimis
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $recaptcha_response = $_POST['g-recaptcha-response'];
+
+    // Verifică reCAPTCHA
+    $secret_key = '6Le1TNgqAAAAACMJ_S-b0_S1AOXv6uunlD-J8R2t'; // Înlocuiește cu cheia ta secretă
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $data = [
+        'secret' => $secret_key,
+        'response' => $recaptcha_response
+    ];
+
+    // Verifică dacă reCAPTCHA este valid
+    $options = [
+        'http' => [
+            'method' => 'POST',
+            'content' => http_build_query($data),
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
+        ]
+    ];
+    $context = stream_context_create($options);
+    $verify_response = file_get_contents($url, false, $context);
+    $response_keys = json_decode($verify_response);
+
+    // Dacă reCAPTCHA nu este valid
+    if (intval($response_keys->success) !== 1) {
+        echo "Verificarea reCAPTCHA a eșuat. Te rugăm să încerci din nou.";
+    } else {
+        // Continuă cu procesul de autentificare aici
+        // Exemplu: Verifică datele din baza de date
+    }
+}
         if ($stmt->execute()) {
             echo "<p class='alert alert-success'>Utilizator creat cu succes!</p>";
         } else {
