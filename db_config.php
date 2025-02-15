@@ -1,14 +1,14 @@
 <?php
-$host = 'f8ogy1hm9ubgfv2s.chr7pe7iynqr.eu-west-1.rds.amazonaws.com'; 
-$db = 'zuzaszw2bd0pm9si'; 
-$user = 'rpcv91eoji2qyhfo';     
-$pass = 'og6jb24bi3aen44g';     
+$cleardb_url = parse_url(getenv("JAWSDB_URL"));
+
+$host = $cleardb_url["host"];
+$user = $cleardb_url["user"];
+$pass = $cleardb_url["pass"];
+$db = substr($cleardb_url["path"], 1);
 
 $conn = new mysqli($host, $user, $pass, $db);
 
 if ($conn->connect_error) {
     die("Conexiunea a eșuat: " . $conn->connect_error);
-} else {
-    echo "Conexiune reușită!";
 }
 ?>
