@@ -8,6 +8,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Verificăm rolul utilizatorului
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
@@ -72,7 +75,10 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
           JOIN Users u ON o.user_id = u.id
           JOIN OrderItems oi ON o.id = oi.id";
     $result_pdf = $conn->query($query);
-
+    if ($result_pdf->num_rows == 0)
+    {
+        die("Nu există date pentru export.");
+    }
     // Creăm instanța FPDF
     $pdf = new FPDF();
     $pdf->AddPage();
@@ -102,8 +108,10 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     ob_end_clean(); // Elimină orice output anterior pentru a preveni coruperea PDF-ului
-$pdf->Output('D', 'comenzi.pdf');
+    $pdf->Output();
+
 exit;
+
 }
 
 // Generăm token CSRF pentru protecție
