@@ -53,6 +53,65 @@ if (isset($_POST['export_csv'])) {
 }
 ?>
 
+<?php
+// Export PDF
+
+session_start();
+include 'db_config.php';
+require('fpdf.php');
+
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'angajat' && $_SESSION['role'] != 'administrator')) {
+    header("Location: login.php");
+    exit;
+}
+
+if (isset($_POST['export_pdf'])) {
+    // Selectăm comenzile și detaliile acestora
+    $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
+              FROM Orders o
+              JOIN Users u ON o.user_id = u.id
+              JOIN OrderItems oi ON o.id = oi.order_id";
+    $result = $conn->query($query);
+
+    // Creăm instanța FPDF
+    $pdf = new FPDF();
+    $pdf->AddPage();
+
+    // Setăm fontul
+    $pdf->SetFont('Arial', 'B', 12);
+
+    // Adăugăm titlu
+    $pdf->Cell(200, 10, 'Raport Comenzi', 0, 1, 'C');
+
+    // Adăugăm header-ul
+    $pdf->Cell(30, 10, 'Order ID', 1);
+    $pdf->Cell(40, 10, 'Data', 1);
+    $pdf->Cell(30, 10, 'Status', 1);
+    $pdf->Cell(40, 10, 'Client', 1);
+    $pdf->Cell(30, 10, 'Produs ID', 1);
+    $pdf->Cell(30, 10, 'Cantitate', 1);
+    $pdf->Cell(30, 10, 'Preț', 1);
+    $pdf->Ln();
+
+    // Adăugăm datele
+    while ($row = $result->fetch_assoc()) {
+        $pdf->Cell(30, 10, $row['order_id'], 1);
+        $pdf->Cell(40, 10, $row['created_at'], 1);
+        $pdf->Cell(30, 10, $row['status'], 1);
+        $pdf->Cell(40, 10, $row['username'], 1);
+        $pdf->Cell(30, 10, $row['product_id'], 1);
+        $pdf->Cell(30, 10, $row['quantity'], 1);
+        $pdf->Cell(30, 10, $row['price'], 1);
+        $pdf->Ln();
+    }
+
+    // Salvăm fișierul PDF
+    $pdf->Output('D', 'comenzi.pdf');
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -89,6 +148,11 @@ if (isset($_POST['export_csv'])) {
     </table>
     <form method="POST">
     <button type="submit" name="export_csv">Exportă în CSV</button>
+    
 </form>
+<form method="POST">
+    <button type="submit" name="export_pdf">Exportă în PDF</button>
+</form>
+
 </body>
 </html>
