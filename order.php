@@ -40,7 +40,7 @@ $result = $conn->query($query);
                     <td>
                         <input type="number" name="product[<?php echo $product['id']; ?>][quantity]" 
                                min="1" max="<?php echo $product['quantity']; ?>" 
-                               placeholder="Cantitate">
+                               placeholder="Cantitate" required>
                     </td>
                 </tr>
             <?php endwhile; ?>

@@ -14,10 +14,10 @@ $user_id = $_SESSION['user_id'];
 $cart = [];
 $total = 0;
 
+// Verificăm dacă există produse selectate
 if (isset($_POST['product'])) {
-    // Iterăm prin produsele selectate de utilizator
     foreach ($_POST['product'] as $product_id => $details) {
-        if ($details['quantity'] > 0) {
+        if (isset($details['quantity']) && $details['quantity'] > 0) {
             $cart[] = [
                 'product_id' => $product_id,
                 'quantity' => $details['quantity']
@@ -26,14 +26,14 @@ if (isset($_POST['product'])) {
     }
 }
 
+// Verificăm dacă există produse în coș
 if (count($cart) === 0) {
-    echo "Nu ai selectat produse!";
+    echo "Nu ai selectat produse sau cantitățile sunt invalide!";
     exit;
 }
 
 // Calculăm totalul comenzii
 foreach ($cart as $item) {
-    // Obținem prețul pentru fiecare produs
     $query = "SELECT price FROM Products WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $item['product_id']);
