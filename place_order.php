@@ -30,8 +30,6 @@ foreach ($_POST['product'] as $product_id => $details) {
         ];
     }
 }
-echo count($cart);
-
 if (count($cart) === 0) {
     echo "Nu ai selectat produse!";
     exit;
@@ -60,12 +58,12 @@ echo number_format($total, 2);
 
 
 // Inserăm comanda în baza de date
-$query = "INSERT INTO Orders (user_id, total, status) VALUES (?, ?, ?)";
-$status = "plasată"; // Statusul inițial al comenzii
+$query = "INSERT INTO Orders (user_id, total) VALUES (?, ?)";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("ids", $user_id, $total, $status);
+$stmt->bind_param("id", $user_id, $total);
 $stmt->execute();
-$order_id = $stmt->insert_id; // ID-ul comenzii plasate
+
+
 
 // Actualizăm stocul produselor și inserăm în OrderItems
 foreach ($cart as $item) {
