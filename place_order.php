@@ -1,9 +1,6 @@
 <?php
 session_start();
 include 'db_config.php';
-echo '<pre>';
-print_r($_POST); // Aceasta va afișa datele care vin din formular
-echo '</pre>';
 
 // Verificăm dacă utilizatorul este autentificat
 if (!isset($_SESSION['user_id'])) {
@@ -86,20 +83,6 @@ foreach ($cart as $item) {
     $stmt->execute();
 }
 
-// Trimiterea notificării prin email
-$query = "SELECT email FROM Users WHERE id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-$to = $user['email'];
-$subject = "Comanda ta a fost plasată";
-$message = "Comanda ta a fost plasată cu succes! Vei primi o notificare când comanda este procesată.";
-$headers = "From: noreply@hipermarket.com";
-
-mail($to, $subject, $message, $headers);
-
+// Afișăm mesajul de succes
 echo "Comanda a fost plasată cu succes!";
 ?>
