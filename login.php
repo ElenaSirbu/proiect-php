@@ -22,33 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Verificăm dacă utilizatorul există în baza de date
-    include 'db_config.php';
-
-    $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        // Utilizatorul există
-        $user = $result->fetch_assoc();
-
-        // Verificăm parola
-        if (password_verify($password, $user['password'])) {
-            // Parola corectă, setăm sesiunea
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-
-$site_key = '6Le1TNgqAAAAAENie2ZNrU4CIFd6lAXPDzhBGWsK'; // Înlocuiește cu cheia ta publică
-
-// Dacă formularul este trimis
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Verificăm reCAPTCHA
     $recaptcha_response = $_POST['g-recaptcha-response'];
 
-    // Verifică reCAPTCHA
+    // Cheia secretă reCAPTCHA
     $secret_key = '6Le1TNgqAAAAACMJ_S-b0_S1AOXv6uunlD-J8R2t'; // Înlocuiește cu cheia ta secretă
     $url = 'https://www.google.com/recaptcha/api/siteverify';
     $data = [
@@ -70,20 +47,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Dacă reCAPTCHA nu este valid
     if (intval($response_keys->success) !== 1) {
-        echo "Verificarea reCAPTCHA a eșuat. Te rugăm să încerci din nou.";
+        $error = "Verificarea reCAPTCHA a eșuat. Te rugăm să încerci din nou.";
     } else {
-        // Continuă cu procesul de autentificare aici
-        // Exemplu: Verifică datele din baza de date
-    }
-}
-            // Redirecționăm utilizatorul la dashboard sau la pagina principală
-            header("Location: dashboard.php");
-            exit;
+        // Dacă reCAPTCHA este valid, continuăm cu procesul de autentificare
+        include 'db_config.php';
+
+        $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Utilizatorul există
+            $user = $result->fetch_assoc();
+
+            // Verificăm parola
+            if (password_verify($password, $user['password'])) {
+                // Parola corectă, setăm sesiunea
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+
+                // Redirecționăm utilizatorul la dashboard sau la pagina principală
+                header("Location: dashboard.php");
+                exit;
+            } else {
+                $error = "Parolă incorectă!";
+            }
         } else {
-            $error = "Parolă incorectă!";
+            $error = "Utilizatorul nu există!";
         }
-    } else {
-        $error = "Utilizatorul nu există!";
     }
 }
 ?>
@@ -97,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Bootstrap CSS (CDN) -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script> <!-- Adăugăm scriptul reCAPTCHA -->
 </head>
 <body class="bg-light">
 
@@ -126,6 +120,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <label for="password">Parolă:</label>
                                 <input type="password" class="form-control" id="password" name="password" required placeholder="Introduceti parola">
                             </div>
+
+                            <!-- reCAPTCHA -->
+                            <div class="g-recaptcha" data-sitekey="6Le1TNgqAAAAAENie2ZNrU4CIFd6lAXPDzhBGWsK"></div><br>
 
                             <button type="submit" class="btn btn-primary btn-block">Autentifică-te</button>
                         </form>
