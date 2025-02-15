@@ -11,6 +11,11 @@ if (!isset($_SESSION['user_id'])) {
 // Obținem produsele disponibile pe stoc
 $query = "SELECT * FROM Products WHERE quantity > 0"; // Afișăm doar produsele care sunt pe stoc
 $result = $conn->query($query);
+
+if ($result->num_rows == 0) {
+    echo "Nu sunt produse disponibile pe stoc.";
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
