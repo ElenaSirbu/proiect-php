@@ -20,6 +20,28 @@ $result = $conn->query($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plasează comanda</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Funcție pentru calculul sumei totale
+        function calculateTotal() {
+            let total = 0;
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                const productId = input.name.match(/\[(\d+)\]\[quantity\]/)[1];
+                const price = parseFloat(document.getElementById(`price_${productId}`).innerText);
+                const quantity = parseInt(input.value) || 0;
+                total += price * quantity;
+            });
+            document.getElementById('total').innerText = total.toFixed(2) + ' RON';
+        }
+
+        // Ascultăm modificările în câmpurile de cantitate
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateTotal);
+            });
+        });
+    </script>
 </head>
 <body>
     <h2>Selectează produsele dorite</h2>
@@ -34,9 +56,9 @@ $result = $conn->query($query);
             </tr>
             <?php while ($product = $result->fetch_assoc()): ?>
                 <tr>
-                    <td><?php echo $product['name']; ?></td>
-                    <td><?php echo $product['quantity']; ?> pe stoc</td>
-                    <td><?php echo $product['price']; ?> RON</td>
+                    <td><?php echo htmlspecialchars($product['name']); ?></td>
+                    <td><?php echo htmlspecialchars($product['quantity']); ?> pe stoc</td>
+                    <td><span id="price_<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['price']); ?></span> RON</td>
                     <td>
                         <input type="number" name="product[<?php echo $product['id']; ?>][quantity]" 
                                min="1" max="<?php echo $product['quantity']; ?>" 
@@ -45,6 +67,7 @@ $result = $conn->query($query);
                 </tr>
             <?php endwhile; ?>
         </table>
+        <p><strong>Total: </strong><span id="total">0.00 RON</span></p>
         <button type="submit">Plasează comanda</button>
     </form>
 </body>

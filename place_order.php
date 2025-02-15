@@ -36,7 +36,7 @@ if (count($cart) === 0) {
 
 // Calculăm totalul comenzii
 foreach ($cart as $item) {
-    $query = "SELECT price, quantity FROM Products WHERE id = ?";
+    $query = "SELECT price, quantity, name FROM Products WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $item['product_id']);
     $stmt->execute();
@@ -45,7 +45,7 @@ foreach ($cart as $item) {
 
     // Verificăm dacă produsul este pe stoc
     if ($product['quantity'] < $item['quantity']) {
-        echo "Nu sunt suficiente produse pe stoc pentru produsul: " . $product['name'];
+        echo "Nu sunt suficiente produse pe stoc pentru produsul: " . htmlspecialchars($product['name']);
         exit;
     }
 
@@ -60,17 +60,26 @@ $stmt->bind_param("ids", $user_id, $total, $status);
 $stmt->execute();
 $order_id = $stmt->insert_id; // ID-ul comenzii plasate
 
-// Actualizăm stocul produselor
+// Actualizăm stocul produselor și inserăm în OrderItems
 foreach ($cart as $item) {
+    // Actualizăm stocul
     $query = "UPDATE Products SET quantity = quantity - ? WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ii", $item['quantity'], $item['product_id']);
     $stmt->execute();
 
-    // Inserăm produsele în OrderItems
+    // Obținem prețul produsului
+    $query = "SELECT price FROM Products WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $item['product_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+
+    // Inserăm în OrderItems
     $query = "INSERT INTO OrderItems (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("iiid", $order_id, $item['product_id'], $item['quantity'], $item['price']);
+    $stmt->bind_param("iiid", $order_id, $item['product_id'], $item['quantity'], $product['price']);
     $stmt->execute();
 }
 
