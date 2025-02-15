@@ -37,7 +37,7 @@ if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                  o.status, u.username, oi.product_id, oi.quantity, oi.price 
           FROM Orders o
           JOIN Users u ON o.user_id = u.id
-          JOIN OrderItems oi ON o.id = oi.order_id";
+          JOIN OrderItems oi ON o.id = oi.id";
     $result_csv = $conn->query($query);
 
     if ($result_csv->num_rows > 0) {
@@ -66,10 +66,11 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Export PDF
     require('fpdf.php');
-    $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
-              FROM Orders o
-              JOIN Users u ON o.user_id = u.id
-              JOIN OrderItems oi ON o.id = oi.order_id";
+    $query = "SELECT o.id AS order_id, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, 
+                 o.status, u.username, oi.product_id, oi.quantity, oi.price 
+          FROM Orders o
+          JOIN Users u ON o.user_id = u.id
+          JOIN OrderItems oi ON o.id = oi.id";
     $result_pdf = $conn->query($query);
 
     // Creăm instanța FPDF
