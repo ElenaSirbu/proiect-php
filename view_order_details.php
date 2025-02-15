@@ -8,18 +8,27 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Verificăm dacă comanda este validă
 if (isset($_GET['order_id'])) {
     $order_id = $_GET['order_id'];
 
-    // Verificăm dacă comanda aparține utilizatorului curent
-    $query = "SELECT * FROM Orders WHERE id = ? AND user_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $order_id, $_SESSION['user_id']);
+    // Verificăm dacă utilizatorul curent este clientul sau angajatul asociat comenzii
+    if ($_SESSION['role'] == 'client') {
+        $query = "SELECT * FROM Orders WHERE id = ? AND user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $order_id, $_SESSION['user_id']);
+    } elseif ($_SESSION['role'] == 'angajat' || $_SESSION['role'] == 'administrator') {
+        $query = "SELECT * FROM Orders WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $order_id);
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
 
+    // Verificăm dacă comanda există
     if ($result->num_rows === 0) {
-        echo "Comanda nu există sau nu îți aparține!";
+        echo "Comanda nu există sau nu ai acces la ea!";
         exit;
     }
 
@@ -45,38 +54,46 @@ if (isset($_GET['order_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalii comandă</title>
+    <title>Detalii Comandă</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Detalii Comandă #<?php echo htmlspecialchars($order['id']); ?></h2>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center">Detalii Comandă #<?php echo htmlspecialchars($order['id']); ?></h2>
 
-    <p><strong>Status:</strong> <?php echo htmlspecialchars($order['status']); ?></p>
-    <p><strong>Total:</strong> <?php echo htmlspecialchars($order['total']); ?> RON</p>
-    <p><strong>Data comenzii:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
+        <p><strong>Status:</strong> <?php echo htmlspecialchars($order['status']); ?></p>
+        <p><strong>Total:</strong> <?php echo htmlspecialchars($order['total']); ?> RON</p>
+        <p><strong>Data comenzii:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
 
-    <h3>Produse incluse în comandă:</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Produs</th>
-                <th>Cantitate</th>
-                <th>Preț unitar</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($item = $items_result->fetch_assoc()): ?>
+        <h3>Produse incluse în comandă:</h3>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($item['name']); ?></td>
-                    <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                    <td><?php echo htmlspecialchars($item['price']); ?> RON</td>
-                    <td><?php echo htmlspecialchars($item['quantity'] * $item['price']); ?> RON</td>
+                    <th>Produs</th>
+                    <th>Cantitate</th>
+                    <th>Preț unitar</th>
+                    <th>Total</th>
                 </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php while ($item = $items_result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($item['name']); ?></td>
+                        <td><?php echo htmlspecialchars($item['quantity']); ?></td>
+                        <td><?php echo htmlspecialchars($item['price']); ?> RON</td>
+                        <td><?php echo htmlspecialchars($item['quantity'] * $item['price']); ?> RON</td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
 
-    <br>
-    <a href="view_orders.php">Înapoi la comenzi</a>
+        <br>
+        <a href="view_orders.php" class="btn btn-secondary">Înapoi la lista comenzilor</a>
+    </div>
+
+    <!-- Include Bootstrap JS și jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -9,6 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 
 // Verificăm rolul utilizatorului din sesiune
 $user_role = $_SESSION['role']; // Presupunem că rolul utilizatorului este stocat în sesiune
+
+// Generăm un token CSRF pentru logout
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Prevenim XSS prin htmlspecialchars
+$username = htmlspecialchars($_SESSION['username']);
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +31,7 @@ $user_role = $_SESSION['role']; // Presupunem că rolul utilizatorului este stoc
 <body>
 
     <div class="container mt-5">
-        <h2>Bine ai venit, <?php echo $_SESSION['username']; ?>!</h2>
+        <h2>Bine ai venit, <?php echo $username; ?>!</h2>
 
         <nav>
             <ul class="list-group">
@@ -54,8 +62,12 @@ $user_role = $_SESSION['role']; // Presupunem că rolul utilizatorului este stoc
 
         <!-- Buton de logout -->
         <form action="logout.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
             <button type="submit" class="btn btn-danger mt-3">Logout</button>
         </form>
+
+        <!-- Buton de întoarcere la Dashboard -->
+        <a href="dashboard.php" class="btn btn-secondary mt-3">Înapoi la Dashboard</a>
     </div>
 
     <!-- Scripturile necesare pentru Bootstrap -->

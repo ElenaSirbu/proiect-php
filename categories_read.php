@@ -1,12 +1,51 @@
 <?php
 include 'db_config.php';
+session_start();
+
+// Verificăm dacă utilizatorul este autentificat și are rol de admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: dashboard.php");
+    exit;
+}
+
+// Generăm și stocăm token CSRF dacă nu există deja
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $result = $conn->query("SELECT * FROM Categories");
-echo "<table border='1'><tr><th>ID</th><th>Nume</th><th>Acțiuni</th></tr>";
+echo "<div class='container mt-5'>
+        <h2>Lista Categoriilor</h2>
+        <table class='table table-striped'>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nume</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>";
+
 while ($row = $result->fetch_assoc()) {
-    echo "<tr><td>{$row['id']}</td><td>{$row['name']}</td>
-    <td><a href='categories_update.php?id={$row['id']}'>Edit</a> | 
-    <a href='categories_delete.php?id={$row['id']}'>Șterge</a></td></tr>";
+    // Protejăm datele de XSS
+    $id = htmlspecialchars($row['id']);
+    $name = htmlspecialchars($row['name']);
+    
+    // Creăm linkuri cu parametrii securizați
+    $edit_link = "categories_update.php?id=" . urlencode($id);
+    $delete_link = "categories_delete.php?id=" . urlencode($id);
+
+    echo "<tr><td>{$id}</td><td>{$name}</td>
+    <td><a href='{$edit_link}' class='btn btn-warning btn-sm'>Edit</a> 
+        <a href='{$delete_link}' class='btn btn-danger btn-sm'>Șterge</a></td></tr>";
 }
-echo "</table>";
+
+echo "</tbody></table>";
+
+// Buton logout
+echo "<a href='logout.php' class='btn btn-danger mb-3'>Deconectează-te</a>";
+// Buton de întoarcere la dashboard
+echo "<a href='dashboard.php' class='btn btn-secondary mb-3'>Înapoi la Dashboard</a>";
+
+echo "</div>";
 ?>

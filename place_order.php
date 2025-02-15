@@ -2,26 +2,24 @@
 session_start();
 include 'db_config.php';
 
-// Verificăm dacă utilizatorul este autentificat
-if (!isset($_SESSION['user_id'])) {
+// Verificăm dacă utilizatorul este autentificat și are rolul de client
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client') {
     header("Location: login.php");
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Obținem produsele din formular
+// Verificăm dacă utilizatorul a selectat produse
 $cart = [];
 $total = 0;
 
-
-
-// Verificăm dacă utilizatorul a selectat produse
 if (!isset($_POST['product']) || empty($_POST['product'])) {
     echo "Nu ai selectat produse!";
     exit;
 }
 
+// Procesăm produsele din coș
 foreach ($_POST['product'] as $product_id => $details) {
     if (isset($details['quantity']) && $details['quantity'] > 0) {
         $cart[] = [
@@ -30,6 +28,7 @@ foreach ($_POST['product'] as $product_id => $details) {
         ];
     }
 }
+
 if (count($cart) === 0) {
     echo "Nu ai selectat produse!";
     exit;
@@ -53,17 +52,12 @@ foreach ($cart as $item) {
     $total += $product['price'] * $item['quantity'];
 }
 
-
-echo number_format($total, 2);
-
-
 // Inserăm comanda în baza de date
 $query = "INSERT INTO Orders (user_id, total) VALUES (?, ?)";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("id", $user_id, $total);
 $stmt->execute();
-
-
+$order_id = $stmt->insert_id;  // Obținem ID-ul comenzii
 
 // Actualizăm stocul produselor și inserăm în OrderItems
 foreach ($cart as $item) {
@@ -89,5 +83,41 @@ foreach ($cart as $item) {
 }
 
 // Afișăm mesajul de succes
-echo "Comanda a fost plasată cu succes!";
 ?>
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comanda Plasată - Hipermarket</title>
+
+    <!-- Bootstrap CSS (CDN) -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Mesajul de succes -->
+                <div class="alert alert-success text-center">
+                    <h4>Comanda a fost plasată cu succes!</h4>
+                    <p>Totalul comenzii este: <strong><?php echo number_format($total, 2); ?> RON</strong></p>
+                    <p>Mulțumim pentru achiziție!</p>
+                </div>
+
+                <!-- Buton Înapoi la Dashboard -->
+                <a href="dashboard.php" class="btn btn-secondary btn-block mb-2">Înapoi la Dashboard</a>
+                <!-- Buton pentru vizualizarea comenzilor -->
+                <a href="orders.php" class="btn btn-primary btn-block">Vizualizează comenzile</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS și jQuery (CDN) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

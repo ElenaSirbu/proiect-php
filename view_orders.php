@@ -8,7 +8,15 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Verificăm rolul utilizatorului
 $user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
+
+// Permitem acces doar clientului sau angajatului
+if ($role !== 'client' && $role !== 'angajat') {
+    echo "Acces interzis. Numai clienții și angajații pot vizualiza comenzile.";
+    exit;
+}
 
 // Obținem comenzile utilizatorului
 $query = "SELECT id, total, status, created_at FROM Orders WHERE user_id = ?";
@@ -17,26 +25,26 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Export CSV
-// Export CSV
-if (isset($_POST['export_csv'])) {
-    // Selectăm comenzile și detaliile acestora
+// Verificăm dacă utilizatorul a solicitat exportul CSV
+if (isset($_POST['export_csv']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Token CSRF pentru protecție
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Token CSRF invalid.");
+    }
+
+    // Export CSV
     $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
               FROM Orders o
               JOIN Users u ON o.user_id = u.id
-              JOIN OrderItems oi ON o.id = oi.id";
+              JOIN OrderItems oi ON o.id = oi.order_id";
     $result_csv = $conn->query($query);
 
-    if ($result_csv->num_rows > 0) {  // Verificăm dacă există date
-        // Deschidem fișierul pentru scrierea CSV
+    if ($result_csv->num_rows > 0) {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="comenzi.csv"');
         $output = fopen('php://output', 'w');
-
-        // Scriem header-ul
         fputcsv($output, ['Order ID', 'Data', 'Status', 'Client', 'Produs ID', 'Cantitate', 'Preț']);
 
-        // Scriem datele
         while ($row = $result_csv->fetch_assoc()) {
             fputcsv($output, $row);
         }
@@ -48,26 +56,25 @@ if (isset($_POST['export_csv'])) {
     }
 }
 
+// Verificăm dacă utilizatorul a solicitat exportul PDF
+if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Token CSRF pentru protecție
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Token CSRF invalid.");
+    }
 
-// Export PDF
-// Export PDF
-// Export PDF
-if (isset($_POST['export_pdf'])) {
-    // Selectăm comenzile și detaliile acestora
+    // Export PDF
+    require('fpdf/fpdf.php');
     $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
               FROM Orders o
               JOIN Users u ON o.user_id = u.id
-              JOIN OrderItems oi ON o.id = oi.id";
-    $result = $conn->query($query);
+              JOIN OrderItems oi ON o.id = oi.order_id";
+    $result_pdf = $conn->query($query);
 
     // Creăm instanța FPDF
-    $pdf = new FPDF();
+  //  $pdf = new FPDF();
     $pdf->AddPage();
-
-    // Setăm fontul
     $pdf->SetFont('Arial', 'B', 12);
-
-    // Adăugăm titlu
     $pdf->Cell(200, 10, 'Raport Comenzi', 0, 1, 'C');
 
     // Adăugăm header-ul
@@ -80,8 +87,7 @@ if (isset($_POST['export_pdf'])) {
     $pdf->Cell(30, 10, 'Preț', 1);
     $pdf->Ln();
 
-    // Adăugăm datele
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $result_pdf->fetch_assoc()) {
         $pdf->Cell(30, 10, $row['order_id'], 1);
         $pdf->Cell(40, 10, $row['created_at'], 1);
         $pdf->Cell(30, 10, $row['status'], 1);
@@ -92,11 +98,12 @@ if (isset($_POST['export_pdf'])) {
         $pdf->Ln();
     }
 
-    // Salvăm fișierul PDF pentru a fi descărcat
     $pdf->Output('D', 'comenzi.pdf');
     exit;
 }
 
+// Generăm token CSRF pentru protecție
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 ?>
 
@@ -106,43 +113,48 @@ if (isset($_POST['export_pdf'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comenzile mele</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Comenzile mele</h2>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center">Comenzile mele</h2>
 
-    <!-- Formular pentru export CSV -->
-    <form method="POST">
-        <button type="submit" name="export_csv">Exportă în CSV</button>
-    </form>
+        <form method="POST" class="mb-3">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <button type="submit" name="export_csv" class="btn btn-primary">Exportă în CSV</button>
+            <button type="submit" name="export_pdf" class="btn btn-success">Exportă în PDF</button>
+        </form>
 
-    <!-- Formular pentru export PDF -->
-    <form method="POST">
-        <button type="submit" name="export_pdf">Exportă în PDF</button>
-    </form>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID Comandă</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Data</th>
-                <th>Detalii</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($order = $result->fetch_assoc()): ?>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($order['id']); ?></td>
-                    <td><?php echo htmlspecialchars($order['total']); ?> RON</td>
-                    <td><?php echo htmlspecialchars($order['status']); ?></td>
-                    <td><?php echo htmlspecialchars($order['created_at']); ?></td>
-                    <td>
-                        <a href="view_order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>">Vezi detalii</a>
-                    </td>
+                    <th>ID Comandă</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Detalii</th>
                 </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php while ($order = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($order['id']); ?></td>
+                        <td><?php echo htmlspecialchars($order['total']); ?> RON</td>
+                        <td><?php echo htmlspecialchars($order['status']); ?></td>
+                        <td><?php echo htmlspecialchars($order['created_at']); ?></td>
+                        <td>
+                            <a href="view_order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>" class="btn btn-info">Vezi detalii</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <a href="dashboard.php" class="btn btn-secondary">Înapoi la dashboard</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

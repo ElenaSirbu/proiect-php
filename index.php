@@ -1,9 +1,15 @@
 <?php
 session_start();
 
+// Verificăm dacă utilizatorul este deja logat, dacă da, îl redirecționăm la dashboard
 if (isset($_SESSION['utilizator'])) {
     header('Location: dashboard.php');
     exit();
+}
+
+// Creăm un token CSRF pentru prevenirea atacurilor
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Token aleator
 }
 ?>
 
@@ -33,4 +39,3 @@ if (isset($_SESSION['utilizator'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-

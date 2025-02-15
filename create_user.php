@@ -1,10 +1,18 @@
 <?php
 include 'db_config.php';
+session_start();
 
+// Verificăm dacă formularul a fost trimis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    // Verificăm dacă token-ul CSRF este valid
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Eroare de securitate! Formularul a fost invalidat.");
+    }
+
+    // Preluăm și validăm datele
+    $username = htmlspecialchars(trim($_POST['username']));
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Criptarea parolei
-    $email = $_POST['email'];
+    $email = htmlspecialchars(trim($_POST['email']));
 
     // Verifică dacă utilizatorul există deja
     $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
@@ -13,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
-        echo "Utilizatorul există deja!";
+        echo "<p class='alert alert-danger'>Utilizatorul există deja!</p>";
     } else {
         // Inserare utilizator în DB
         $stmt = $conn->prepare("INSERT INTO Users (username, password, email, role) VALUES (?, ?, ?, ?)");
@@ -21,14 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssss", $username, $password, $email, $role);
 
         if ($stmt->execute()) {
-            echo "Utilizator creat cu succes!";
+            echo "<p class='alert alert-success'>Utilizator creat cu succes!</p>";
         } else {
-            echo "Eroare la crearea utilizatorului: " . $stmt->error;
+            echo "<p class='alert alert-danger'>Eroare la crearea utilizatorului: " . $stmt->error . "</p>";
         }
     }
 }
-?>
 
+// Generăm un token CSRF pentru protecție
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+?>
 
 <!DOCTYPE html>
 <html lang="ro">
@@ -49,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="card-body">
                         <h1 class="card-title text-center mb-4">Crează un cont nou</h1>
 
-                        <!-- Formul de creare cont -->
+                        <!-- Formularul de creare cont -->
                         <form method="POST" action="create_user.php">
                             <div class="form-group">
                                 <label for="username">Nume utilizator:</label>
@@ -66,10 +76,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="password" class="form-control" id="password" name="password" required placeholder="Introduceti parola">
                             </div>
 
+                            <!-- Token CSRF -->
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
                             <button type="submit" class="btn btn-primary btn-block">Creează cont</button>
                         </form>
 
                         <p class="text-center mt-3">Ai deja un cont? <a href="login.php">Autentifică-te</a></p>
+                        <a href="dashboard.php" class="btn btn-secondary btn-block mt-3">Înapoi la Dashboard</a>
                     </div>
                 </div>
             </div>

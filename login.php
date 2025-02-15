@@ -7,7 +7,17 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
+// CSRF Token - generăm un token pentru a preveni CSRF
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Verificăm CSRF Token
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Token CSRF invalid");
+    }
+
     // Preluăm datele din formular
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -64,11 +74,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <!-- Afișăm mesajul de eroare, dacă există -->
                         <?php if (isset($error)): ?>
-                            <div class="alert alert-danger"><?php echo $error; ?></div>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                         <?php endif; ?>
 
                         <!-- Formular de login -->
                         <form method="POST" action="login.php">
+                            <!-- CSRF Token -->
+                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
                             <div class="form-group">
                                 <label for="username">Nume utilizator:</label>
                                 <input type="text" class="form-control" id="username" name="username" required placeholder="Introduceti numele de utilizator">
@@ -83,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </form>
 
                         <p class="text-center mt-3">Nu ai cont? <a href="create_user.php">Creează unul acum!</a></p>
+                        <p class="text-center mt-3"><a href="forgot_password.php">Ai uitat parola?</a></p>
                     </div>
                 </div>
             </div>
