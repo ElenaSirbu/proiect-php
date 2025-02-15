@@ -1,71 +1,83 @@
+/* Stiluri generale */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    color: #333;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    flex-direction: column;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
 }
 
 h1 {
-    font-size: 36px;
-    color: #1e88e5;
+    color: #333;
     margin-bottom: 20px;
 }
 
-p {
-    font-size: 18px;
-    margin: 10px 0;
+footer {
+    margin-top: 20px;
+}
+
+footer p {
+    font-size: 14px;
 }
 
 a {
-    color: #1e88e5;
+    color: #007bff;
     text-decoration: none;
-    font-weight: bold;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
-.buttons-container {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+/* Stil pentru formular */
+.form-container label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
 }
 
-.button {
-    padding: 12px 20px;
-    background-color: #1e88e5;
-    color: white;
+.form-container input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-container button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-weight: bold;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
 }
 
-.button:hover {
-    background-color: #1565c0;
+.form-container button:hover {
+    background-color: #0056b3;
 }
 
-.container {
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 100%;
-    max-width: 500px;
+/* Mesaje de succes și eroare */
+.success {
+    color: green;
+    margin-top: 20px;
 }
 
-.container p {
-    font-size: 20px;
-    margin-bottom: 20px;
+.error {
+    color: red;
+    margin-top: 20px;
 }

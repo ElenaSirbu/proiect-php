@@ -30,28 +30,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 
-<h2>Adaugă Utilizator</h2>
-<form method="POST">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Parolă" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <select name="role">
-        <option value="client">Client</option>
-        <option value="angajat">Angajat</option>
-        <option value="administrator">Administrator</option>
-    </select>
-    <button type="submit">Adaugă Utilizator</button>
-</form>
-
-
 <!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-
-    <!-- Include fișierul CSS -->
-    <link rel="stylesheet" href="style.css"> <!-- Calea corectă în funcție de locul unde ai salvat CSS-ul -->
+    <title>Creare Cont - Hipermarket</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div class="container">
+        <h2>Crează un cont nou</h2>
+
+        <form method="POST" action="create_user.php">
+            <label for="username">Nume utilizator:</label>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <label for="password">Parolă:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="submit" class="button">Creează cont</button>
+        </form>
+        <p>Ai deja un cont? <a href="login.php">Autentifică-te</a></p>
+    </div>
+
+</body>
+</html>
