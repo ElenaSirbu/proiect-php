@@ -10,11 +10,12 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Preluăm comenzile utilizatorului
-$stmt = $conn->prepare("SELECT * FROM Orders WHERE user_id = ?");
+// Interogăm comenzile utilizatorului
+$query = "SELECT * FROM Orders WHERE user_id = ?";
+$stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$result = $stmt->get_result();
+$orders = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -22,26 +23,33 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comenzile tale</title>
+    <title>Comenzile mele</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Comenzile tale</h2>
-    <table>
-        <tr>
-            <th>ID Comandă</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Detalii</th>
-        </tr>
-        <?php while ($order = $result->fetch_assoc()) { ?>
+    <h2>Comenzile mele</h2>
+
+    <?php if ($orders->num_rows > 0): ?>
+        <table>
             <tr>
-                <td><?php echo $order['id']; ?></td>
-                <td><?php echo $order['total']; ?></td>
-                <td><?php echo $order['status']; ?></td>
-                <td><a href="order_details.php?order_id=<?php echo $order['id']; ?>">Vezi detalii</a></td>
+                <th>ID Comandă</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Detalii</th>
             </tr>
-        <?php } ?>
-    </table>
+            <?php while ($order = $orders->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $order['id']; ?></td>
+                    <td><?php echo $order['status']; ?></td>
+                    <td><?php echo $order['total']; ?> RON</td>
+                    <td>
+                        <a href="view_order_details.php?order_id=<?php echo $order['id']; ?>">Vezi Detalii</a>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php else: ?>
+        <p>Nu ai plasat nicio comandă încă.</p>
+    <?php endif; ?>
 </body>
 </html>

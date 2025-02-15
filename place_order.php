@@ -27,21 +27,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Preluăm produsele selectate din formular
     foreach ($_POST['product_id'] as $index => $product_id) {
         $quantity = $_POST['quantity'][$index];
+        
+        // Verificăm dacă produsul există în baza de date
         $stmt = $conn->prepare("SELECT * FROM Products WHERE id = ?");
         $stmt->bind_param("i", $product_id);
         $stmt->execute();
         $product_result = $stmt->get_result();
         $product = $product_result->fetch_assoc();
 
-        // Calculăm prețul total pentru fiecare produs
-        $price = $product['price'];
-        $item_total = $price * $quantity;
-        $total += $item_total;
+        if ($product) {
+            // Calculăm prețul total pentru fiecare produs
+            $price = $product['price'];
+            $item_total = $price * $quantity;
+            $total += $item_total;
 
-        // Adăugăm item-ul în tabela OrderItems
-        $stmt = $conn->prepare("INSERT INTO OrderItems (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iiii", $order_id, $product_id, $quantity, $price);
-        $stmt->execute();
+            // Adăugăm item-ul în tabela OrderItems
+            $stmt = $conn->prepare("INSERT INTO OrderItems (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iiii", $order_id, $product_id, $quantity, $price);
+            $stmt->execute();
+        }
     }
 
     // Actualizăm totalul comenzii
