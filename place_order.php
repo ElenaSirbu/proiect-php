@@ -15,6 +15,7 @@ $cart = [];
 $total = 0;
 
 if (isset($_POST['product'])) {
+    // Iterăm prin produsele selectate de utilizator
     foreach ($_POST['product'] as $product_id => $details) {
         if ($details['quantity'] > 0) {
             $cart[] = [
@@ -32,6 +33,7 @@ if (count($cart) === 0) {
 
 // Calculăm totalul comenzii
 foreach ($cart as $item) {
+    // Obținem prețul pentru fiecare produs
     $query = "SELECT price FROM Products WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $item['product_id']);
@@ -41,21 +43,12 @@ foreach ($cart as $item) {
     $total += $product['price'] * $item['quantity'];
 }
 
-// Inserăm comanda în baza de date
+// Inserăm comanda în tabela Orders
 $query = "INSERT INTO Orders (user_id, total, status) VALUES (?, ?, ?)";
 $status = "plasată"; // Statusul inițial al comenzii
 $stmt = $conn->prepare($query);
-if ($stmt === false) {
-    echo "Eroare la pregătirea interogării: " . $conn->error;
-    exit;
-}
-
 $stmt->bind_param("ids", $user_id, $total, $status);
-if (!$stmt->execute()) {
-    echo "Eroare la executarea interogării: " . $stmt->error;
-    exit;
-}
-
+$stmt->execute();
 $order_id = $stmt->insert_id; // ID-ul comenzii plasate
 
 // Adăugăm produsele în OrderItems
@@ -66,9 +59,14 @@ foreach ($cart as $item) {
     $stmt->bind_param("iiid", $order_id, $item['product_id'], $item['quantity'], $item['product_id']);
     $stmt->execute();
 }
-if ($stmt->execute()) {
-    echo "Comanda a fost plasată cu succes!";
-} else {
-    echo "Eroare la plasarea comenzii: " . $stmt->error;
+
+// Actualizăm cantitatea produselor în tabela Products
+foreach ($cart as $item) {
+    $query = "UPDATE Products SET quantity = quantity - ? WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ii", $item['quantity'], $item['product_id']);
+    $stmt->execute();
 }
+
+echo "Comanda a fost plasată cu succes!";
 ?>

@@ -38,7 +38,9 @@ $result = $conn->query($query);
                     <td><?php echo $product['quantity']; ?> pe stoc</td>
                     <td><?php echo $product['price']; ?> RON</td>
                     <td>
-                        <input type="number" name="product[<?php echo $product['id']; ?>][quantity]" min="1" max="<?php echo $product['quantity']; ?>" placeholder="Cantitate">
+                        <input type="number" name="product[<?php echo $product['id']; ?>][quantity]" 
+                               min="1" max="<?php echo $product['quantity']; ?>" 
+                               placeholder="Cantitate">
                     </td>
                 </tr>
             <?php endwhile; ?>
