@@ -9,10 +9,11 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $site_key = '6Le1TNgqAAAAAENie2ZNrU4CIFd6lAXPDzhBGWsK';
 
 // Verificăm dacă formularul a fost trimis
-if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    echo "Token CSRF: " . $_SESSION['csrf_token']; // Afișează valoarea token-ului pentru debug
-    die("Eroare de securitate! Formularul a fost invalidat.");
-
+/*if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Verificăm dacă token-ul CSRF este valid
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Eroare de securitate! Formularul a fost invalidat.");
+    }*/
 
     // Preluăm și validăm datele
     $username = htmlspecialchars(trim($_POST['username']));
@@ -65,7 +66,7 @@ if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             }
         }
     }
-}
+//}
 ?>
 
 <!DOCTYPE html>
