@@ -10,12 +10,19 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Interogăm comenzile utilizatorului
-$query = "SELECT * FROM Orders WHERE user_id = ?";
+// Obținem comenzile utilizatorului sau toate comenzile dacă este angajat/administrator
+if ($_SESSION['role'] === 'administrator' || $_SESSION['role'] === 'angajat') {
+    $query = "SELECT * FROM Orders";
+} else {
+    $query = "SELECT * FROM Orders WHERE user_id = ?";
+}
+
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $user_id);
+if ($_SESSION['role'] !== 'administrator' && $_SESSION['role'] !== 'angajat') {
+    $stmt->bind_param("i", $user_id);
+}
 $stmt->execute();
-$orders = $stmt->get_result();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -23,33 +30,36 @@ $orders = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comenzile mele</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Vizualizează comenzile</title>
 </head>
 <body>
-    <h2>Comenzile mele</h2>
+    <h2>Comenzile tale</h2>
 
-    <?php if ($orders->num_rows > 0): ?>
-        <table>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Acțiune</th>
+        </tr>
+        <?php while ($order = $result->fetch_assoc()): ?>
             <tr>
-                <th>ID Comandă</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Detalii</th>
+                <td><?php echo $order['id']; ?></td>
+                <td><?php echo $order['total']; ?> RON</td>
+                <td><?php echo $order['status']; ?></td>
+                <td>
+                    <?php if ($order['status'] == 'plasată' && ($_SESSION['role'] == 'angajat' || $_SESSION['role'] == 'administrator')): ?>
+                        <a href="process_order.php?order_id=<?php echo $order['id']; ?>&status=procesată">Procesează</a>
+                    <?php endif; ?>
+                    <?php if ($order['status'] == 'procesată' && ($_SESSION['role'] == 'angajat' || $_SESSION['role'] == 'administrator')): ?>
+                        <a href="process_order.php?order_id=<?php echo $order['id']; ?>&status=livrată">Livrare</a>
+                    <?php endif; ?>
+                    <?php if ($order['status'] != 'livrată' && $_SESSION['role'] == 'client'): ?>
+                        <a href="cancel_order.php?order_id=<?php echo $order['id']; ?>">Anulează comanda</a>
+                    <?php endif; ?>
+                </td>
             </tr>
-            <?php while ($order = $orders->fetch_assoc()): ?>
-                <tr>
-                    <td><?php echo $order['id']; ?></td>
-                    <td><?php echo $order['status']; ?></td>
-                    <td><?php echo $order['total']; ?> RON</td>
-                    <td>
-                        <a href="view_order_details.php?order_id=<?php echo $order['id']; ?>">Vezi Detalii</a>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        </table>
-    <?php else: ?>
-        <p>Nu ai plasat nicio comandă încă.</p>
-    <?php endif; ?>
+        <?php endwhile; ?>
+    </table>
 </body>
 </html>
