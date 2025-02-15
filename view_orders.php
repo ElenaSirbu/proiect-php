@@ -64,7 +64,7 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Export PDF
-    require('fpdf/fpdf.php');
+    require('fpdf.php');
     $query = "SELECT o.id AS order_id, o.created_at, o.status, u.username, oi.product_id, oi.quantity, oi.price 
               FROM Orders o
               JOIN Users u ON o.user_id = u.id
@@ -72,7 +72,7 @@ if (isset($_POST['export_pdf']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $result_pdf = $conn->query($query);
 
     // Creăm instanța FPDF
-  //  $pdf = new FPDF();
+    $pdf = new FPDF();
     $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 12);
     $pdf->Cell(200, 10, 'Raport Comenzi', 0, 1, 'C');

@@ -3,6 +3,13 @@ session_start(); // Începe sesiunea pentru a gestiona utilizatorul
 
 include 'db_config.php'; // Conectare la baza de date
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'phpmailer/src/Exception.php';
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/SMTP.php';
+
 // Verifică dacă formularul este trimis prin POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validăm și curățăm emailul utilizatorului
@@ -36,13 +43,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("si", $token, $user['id']);
         $stmt->execute();
 
-        // Trimitem email cu link pentru resetare parolă
-        $reset_link = "https://example.com/reset_password.php?token=$token"; // URL-ul real trebuie actualizat
-        $subject = "Resetare parolă";
-        $message = "Pentru a-ți reseta parola, accesează următorul link: $reset_link";
-        $headers = "From: no-reply@example.com";
+        // Crează un obiect PHPMailer
+        $mail = new PHPMailer();
 
-        if (mail($email, $subject, $message, $headers)) {
+        // Setează că folosim SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';  // Folosește serverul SMTP dorit (de exemplu, Gmail)
+        $mail->SMTPAuth = true;
+        $mail->Username = 'adresa_ta_de_email@gmail.com';  // Înlocuiește cu adresa ta de email
+        $mail->Password = 'parola_ta_de_email';  // Înlocuiește cu parola ta de email
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;  // Portul SMTP pentru Gmail
+
+        // Setează expeditorul și destinatarul
+        $mail->setFrom('no-reply@example.com', 'Numele Tău');
+        $mail->addAddress($email, $user['username']);  // Adresa destinatarului
+
+        // Setează subiectul și corpul mesajului
+        $reset_link = "https://example.com/reset_password.php?token=$token"; // URL-ul real trebuie actualizat
+        $mail->Subject = 'Resetare parolă';
+        $mail->Body    = "Pentru a-ți reseta parola, accesează următorul link: $reset_link";
+
+        // Trimite email-ul
+        if ($mail->send()) {
             echo "Un email de resetare a parolei a fost trimis! Verifică-ți inboxul.";
         } else {
             echo "Eroare la trimiterea emailului. Te rugăm să încerci din nou!";
