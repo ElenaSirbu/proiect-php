@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'db_config.php';
+echo '<pre>';
+print_r($_POST); // Aceasta va afișa datele care vin din formular
+echo '</pre>';
 
 // Verificăm dacă utilizatorul este autentificat
 if (!isset($_SESSION['user_id'])) {
