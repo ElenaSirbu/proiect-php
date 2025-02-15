@@ -13,11 +13,24 @@ if (isset($_SESSION['utilizator'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagina Principală - Hipermarket</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Bun venit la Hipermarket!</h1>
 
-    <p><a href="login.php">Autentifică-te</a></p>
-    <p>Nu ai cont? <a href="register.php">Creează un cont</a></p>
+    <div class="container">
+        <h1>Bun venit la Hipermarket!</h1>
+
+        <p>Vă oferim cele mai bune produse la prețuri excelente.</p>
+
+        <div class="buttons-container">
+            <a href="login.php">
+                <button class="button">Autentifică-te</button>
+            </a>
+            <a href="register.php">
+                <button class="button">Creează un cont</button>
+            </a>
+        </div>
+    </div>
+
 </body>
 </html>
