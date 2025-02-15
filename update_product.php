@@ -3,7 +3,7 @@ session_start();
 include 'db_config.php';
 
 // Verificăm dacă utilizatorul este angajat
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'angajat') {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'angajat' && $_SESSION['role'] !== 'administrator') {
     header("Location: login.php");
     exit;
 }
@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <div class="mt-3">
-            <a href="products_list.php" class="btn btn-secondary">Înapoi la lista de produse</a>
+            <a href="list_products.php" class="btn btn-secondary">Înapoi la lista de produse</a>
         </div>
     </div>
 

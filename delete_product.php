@@ -2,7 +2,7 @@
 session_start();
 
 // Verificăm dacă utilizatorul este autentificat și are rolul corespunzător
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'admin' && $_SESSION['role'] !== 'angajat')) {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'administrator' && $_SESSION['role'] !== 'angajat')) {
     // Dacă nu este autentificat sau nu are permisiunea, redirecționează-l către dashboard
     header("Location: dashboard.php");
     exit();

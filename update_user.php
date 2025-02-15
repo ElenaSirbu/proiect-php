@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <div class="mt-3">
-            <a href="users_list.php" class="btn btn-secondary">Înapoi la lista de utilizatori</a>
+            <a href="list_users.php" class="btn btn-secondary">Înapoi la lista de utilizatori</a>
         </div>
     </div>
 

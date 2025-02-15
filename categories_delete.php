@@ -13,16 +13,17 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['category_name'])) {
     // Verificare CSRF token
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die("<p style='color: red;'>Eroare CSRF detectată!</p>");
     }
 
-    $id = intval($_POST['id']); // Asigurare că ID-ul este numeric
+    $category_name = $_POST['category_name']; // Numele categoriei selectate
 
-    $stmt = $conn->prepare("DELETE FROM Categories WHERE id = ?");
-    $stmt->bind_param("i", $id);
+    // Pregătim interogarea pentru a șterge categoria după nume
+    $stmt = $conn->prepare("DELETE FROM Categories WHERE name = ?");
+    $stmt->bind_param("s", $category_name); // Bind pentru string
 
     if ($stmt->execute()) {
         echo "<p style='color: green;'>Categorie ștearsă cu succes!</p>";
@@ -47,8 +48,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
     <form method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
         <div class="form-group">
-            <label for="id">ID Categorie:</label>
-            <input type="number" class="form-control" name="id" required>
+            <label for="category_name">Categorie:</label>
+            <select class="form-control" name="category_name" required>
+                <option value="">Alege o categorie</option>
+                <?php
+                    // Obținem toate categoriile din baza de date
+                    $query = "SELECT name FROM Categories";
+                    $result = $conn->query($query);
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
+                        }
+                    } else {
+                        echo "<option value=''>Nu sunt categorii disponibile</option>";
+                    }
+                ?>
+            </select>
         </div>
         <button type="submit" class="btn btn-danger">Șterge</button>
         <a href="dashboard.php" class="btn btn-secondary">Înapoi la Dashboard</a>

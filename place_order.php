@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 include 'db_config.php';
 
@@ -94,13 +94,35 @@ foreach ($cart as $item) {
 
     <!-- Bootstrap CSS (CDN) -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Animații CSS -->
+    <style>
+        @keyframes fadeInBounce {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .alert {
+            animation: fadeInBounce 1.5s ease-out;
+        }
+    </style>
+
 </head>
 <body class="bg-light">
+
+    <!-- Sunet de succes -->
+    <audio id="success-sound" src="success.mp3" preload="auto"></audio>
+    <script>
+        window.onload = function() {
+            document.getElementById("success-sound").play(); // Redăm sunetul la încărcarea paginii
+        };
+    </script>
 
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <!-- Mesajul de succes -->
+                <!-- Mesajul de succes cu animație -->
                 <div class="alert alert-success text-center">
                     <h4>Comanda a fost plasată cu succes!</h4>
                     <p>Totalul comenzii este: <strong><?php echo number_format($total, 2); ?> RON</strong></p>
@@ -110,7 +132,7 @@ foreach ($cart as $item) {
                 <!-- Buton Înapoi la Dashboard -->
                 <a href="dashboard.php" class="btn btn-secondary btn-block mb-2">Înapoi la Dashboard</a>
                 <!-- Buton pentru vizualizarea comenzilor -->
-                <a href="orders.php" class="btn btn-primary btn-block">Vizualizează comenzile</a>
+                <a href="view_orders.php" class="btn btn-primary btn-block">Vizualizează comenzile</a>
             </div>
         </div>
     </div>

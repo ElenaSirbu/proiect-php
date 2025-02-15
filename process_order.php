@@ -97,9 +97,9 @@ if (isset($_GET['order_id']) && isset($_GET['status'])) {
                                 <td><?php echo htmlspecialchars($order['status']); ?></td>
                                 <td>
                                     <!-- Linkuri pentru schimbarea statusului comenzii -->
-                                    <a href="process_orders.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=procesată" class="btn btn-warning btn-sm">Procesează</a> | 
-                                    <a href="process_orders.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=livrată" class="btn btn-success btn-sm">Livrată</a> | 
-                                    <a href="process_orders.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=anulată" class="btn btn-danger btn-sm">Anulează</a>
+                                    <a href="process_order.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=procesată" class="btn btn-warning btn-sm">Procesează</a> | 
+                                    <a href="process_order.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=livrată" class="btn btn-success btn-sm">Livrată</a> | 
+                                    <a href="process_order.php?order_id=<?php echo htmlspecialchars($order['id']); ?>&status=anulată" class="btn btn-danger btn-sm">Anulează</a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
