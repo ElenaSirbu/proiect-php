@@ -11,7 +11,7 @@ require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
 // Verifică dacă formularul este trimis prin POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+/*if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validăm și curățăm emailul utilizatorului
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
@@ -50,17 +50,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';  // Folosește serverul SMTP dorit (de exemplu, Gmail)
         $mail->SMTPAuth = true;
-        $mail->Username = 'adresa_ta_de_email@gmail.com';  // Înlocuiește cu adresa ta de email
-        $mail->Password = 'parola_ta_de_email';  // Înlocuiește cu parola ta de email
+        $mail->Username = '@gmail.com'; 
+        $mail->Password = ''; 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;  // Portul SMTP pentru Gmail
 
         // Setează expeditorul și destinatarul
-        $mail->setFrom('no-reply@example.com', 'Numele Tău');
+        $mail->setFrom('', '');
         $mail->addAddress($email, $user['username']);  // Adresa destinatarului
 
         // Setează subiectul și corpul mesajului
-        $reset_link = "https://example.com/reset_password.php?token=$token"; // URL-ul real trebuie actualizat
+        $reset_link = "/reset_password.php?token=$token"; // URL-ul real trebuie actualizat
         $mail->Subject = 'Resetare parolă';
         $mail->Body    = "Pentru a-ți reseta parola, accesează următorul link: $reset_link";
 
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "Adresa de email nu există!";
     }
-}
+}*/
 
 // Generăm un token CSRF pentru formular
 if (!isset($_SESSION['csrf_token'])) {

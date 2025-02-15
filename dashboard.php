@@ -63,13 +63,11 @@ $username = htmlspecialchars($_SESSION['username']);
             </ul>
         </nav>
 
-        <!-- Buton de logout -->
         <form action="logout.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
             <button type="submit" class="btn btn-danger mt-3">Logout</button>
         </form>
 
-        <!-- Buton de întoarcere la Dashboard -->
         <a href="dashboard.php" class="btn btn-secondary mt-3">Înapoi la Dashboard</a>
     </div>
 

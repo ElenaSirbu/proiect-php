@@ -42,9 +42,7 @@ while ($row = $result->fetch_assoc()) {
 
 echo "</tbody></table>";
 
-// Buton logout
 echo "<a href='logout.php' class='btn btn-danger mb-3'>Deconectează-te</a>";
-// Buton de întoarcere la dashboard
 echo "<a href='dashboard.php' class='btn btn-secondary mb-3'>Înapoi la Dashboard</a>";
 
 echo "</div>";

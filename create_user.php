@@ -5,7 +5,7 @@ session_start();
 // Generăm un token CSRF pentru protecție
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-// Cheia publică reCAPTCHA (se înlocuiește cu cheia ta publică)
+// Cheia publică reCAPTCHA
 $site_key = '6Le1TNgqAAAAAENie2ZNrU4CIFd6lAXPDzhBGWsK';
 
 // Verificăm dacă formularul a fost trimis

@@ -18,7 +18,6 @@ $stmt = $conn->prepare("SELECT Products.id, Products.name, Products.price, Produ
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Obținem produsele din baza de date
 $products = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
@@ -70,7 +69,6 @@ $products = $result->fetch_all(MYSQLI_ASSOC);
             </tbody>
         </table>
 
-        <!-- Buton pentru a reveni la dashboard -->
         <div class="text-center mt-4">
             <a href="dashboard.php" class="btn btn-primary">Înapoi la Dashboard</a>
         </div>

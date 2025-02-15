@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['category_name'])) {
         die("<p style='color: red;'>Eroare CSRF detectată!</p>");
     }
 
-    $category_name = $_POST['category_name']; // Numele categoriei selectate
+    $category_name = $_POST['category_name']; 
 
     // Pregătim interogarea pentru a șterge categoria după nume
     $stmt = $conn->prepare("DELETE FROM Categories WHERE name = ?");

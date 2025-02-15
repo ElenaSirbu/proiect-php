@@ -3,7 +3,7 @@ session_start();
 
 // Verificăm dacă utilizatorul este deja autentificat
 if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php"); // Redirecționăm utilizatorul către pagina principală (dashboard) dacă e deja logat
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $recaptcha_response = $_POST['g-recaptcha-response'];
 
     // Cheia secretă reCAPTCHA
-    $secret_key = '6Le1TNgqAAAAACMJ_S-b0_S1AOXv6uunlD-J8R2t'; // Înlocuiește cu cheia ta secretă
+    $secret_key = '6Le1TNgqAAAAACMJ_S-b0_S1AOXv6uunlD-J8R2t'; 
     $url = 'https://www.google.com/recaptcha/api/siteverify';
     $data = [
         'secret' => $secret_key,
