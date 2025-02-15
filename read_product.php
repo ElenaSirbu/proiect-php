@@ -8,6 +8,8 @@ $products = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <h2>Lista Produse</h2>
+<a href="create_product.php">➕ Adaugă produs</a>
+
 <table border="1">
     <tr>
         <th>ID</th>
@@ -25,8 +27,8 @@ $products = $result->fetch_all(MYSQLI_ASSOC);
             <td><?= $product['quantity'] ?></td>
             <td><?= $product['category'] ?></td>
             <td>
-                <a href="update_product.php?id=<?= $product['id'] ?>">Editează</a> | 
-                <a href="delete_product.php?id=<?= $product['id'] ?>" onclick="return confirm('Sigur ștergi produsul?')">Șterge</a>
+                <a href="update_product.php?id=<?= $product['id'] ?>">✏️ Editează</a> | 
+                <a href="delete_product.php?id=<?= $product['id'] ?>" onclick="return confirm('Sigur ștergi produsul?')">🗑️ Șterge</a>
             </td>
         </tr>
     <?php } ?>
